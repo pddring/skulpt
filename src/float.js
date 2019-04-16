@@ -17,8 +17,11 @@ Sk.builtin.float_ = function (x) {
             tmp = NaN;
         } else if (!isNaN(x.v)) {
             tmp = parseFloat(x.v);
+            if(isNaN(tmp)) {
+                throw new Sk.builtin.ValueError("could not convert string to float: '" + x.v + "'");    
+            }
         } else {
-            throw new Sk.builtin.ValueError("float: Argument: " + x.v + " is not number");
+            throw new Sk.builtin.ValueError("could not convert string to float: '" + x.v + "'");
         }
         return new Sk.builtin.nmber(tmp, Sk.builtin.nmber.float$);
     }

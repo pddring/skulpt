@@ -10,17 +10,34 @@ Sk.builtin.file = function (name, mode, buffering) {
     this.mode = mode;
     this.name = name;
     this.closed = false;
-    if (Sk.inBrowser) {  // todo:  Maybe provide a replaceable function for non-import files
-        elem = document.getElementById(name.v);
-        if (elem == null) {
-            throw new Sk.builtin.IOError("[Errno 2] No such file or directory: '" + name.v + "'");
-        } else {
-            if (elem.nodeName.toLowerCase() == "textarea") {
-                this.data$ = elem.value;
-            } else {
-                this.data$ = elem.textContent;
-            }
-        }
+    if (Sk.inBrowser) {  
+		if(Sk.readFile) {
+			switch(mode.v[0]) {
+				case 'r':
+				case 'a':
+					this.data$ = Sk.readFile(name.v);
+					if(!this.data$) {
+						throw new Sk.builtin.IOError("[Errno 2] No such file or directory: '" + name.v + "'");
+					}
+					break;
+				case 'w':
+					this.data$ = '';
+					Sk.writeFile(name.v, '');
+				break;
+				
+			}
+		} else {
+			elem = document.getElementById(name.v);
+			if (elem == null) {
+				throw new Sk.builtin.IOError("[Errno 2] No such file or directory: '" + name.v + "'");
+			} else {
+				if (elem.nodeName.toLowerCase() == "textarea") {
+					this.data$ = elem.value;
+				} else {
+					this.data$ = elem.textContent;
+				}
+			}
+		}
     } else {
         this.data$ = Sk.read(name.v);
     }
@@ -145,7 +162,20 @@ Sk.builtin.file.prototype["truncate"] = new Sk.builtin.func(function (self, size
 });
 
 Sk.builtin.file.prototype["write"] = new Sk.builtin.func(function (self, str) {
-    goog.asserts.fail();
+	switch(self.mode.v[0]){
+		case 'r':
+			throw new Sk.builtin.IOError('File not open for writing');
+			break;
+		case 'w':
+		case 'a':
+			if(Sk.writeFile) {
+				self.data$ += str.v;
+				Sk.writeFile(self.name.v, self.data$);
+			} else {
+				throw new Sk.builtin.IOError('File I/O not enabled');
+			}
+			break;
+	}
 });
 
 

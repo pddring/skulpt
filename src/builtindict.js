@@ -81,6 +81,7 @@ Sk.builtins = {
     "issubclass": Sk.builtin.issubclass,
     "iter"      : Sk.builtin.iter,
     "complex"   : Sk.builtin.complex,
+    "bytes"     : Sk.builtin.bytes,
 
     // Functions below are not implemented
     "bytearray" : Sk.builtin.bytearray,

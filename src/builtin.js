@@ -5,6 +5,10 @@
  * work, etc.
  */
 
+Sk.builtin.bytes = function bytes(source, encoding, errors) {
+    return source;
+}
+
 Sk.builtin.range = function range (start, stop, step) {
     var ret = [];
     var i;
@@ -614,9 +618,17 @@ Sk.builtin.open = function open (filename, mode, bufsize) {
     if (mode === undefined) {
         mode = new Sk.builtin.str("r");
     }
-    if (mode.v !== "r" && mode.v !== "rb") {
-        throw "todo; haven't implemented non-read opens";
-    }
+	switch(mode.v[0]) {
+		case 'r':
+		case 'w':
+		case 'a':
+		case 'U':
+		break;
+		default:
+			throw new Sk.builtin.ValueError("mode string must begin with one of 'r', 'w', 'a' or 'U', not '" + mode.v + "'");
+		break;
+	}
+
     return new Sk.builtin.file(filename, mode, bufsize);
 };
 
@@ -807,6 +819,7 @@ Sk.builtin.jsmillis = function jsmillis () {
 };
 
 Sk.builtin.superbi = function superbi () {
+//    debugger;
     throw new Sk.builtin.NotImplementedError("super is not yet implemented, please report your use case as a github issue.");
 };
 
